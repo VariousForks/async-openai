@@ -4,6 +4,7 @@ Content: "write a marketing blog praising and introducing Rust library async-ope
 
 <img src="https://raw.githubusercontent.com/64bit/async-openai/assets/chat-stream/output.svg" />
 
+This example is like chat-stream but in more functional style.
 
 
 ## Other Examples

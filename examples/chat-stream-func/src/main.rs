@@ -2,7 +2,7 @@ use async_openai::{
     types::{ChatCompletionRequestMessageArgs, CreateChatCompletionRequestArgs, Role},
     Client,
 };
-use futures::{StreamExt, TryStreamExt};
+use futures::StreamExt; // remove TryStreamExt
 use std::error::Error;
 use std::io::{stdout, Write};
 
