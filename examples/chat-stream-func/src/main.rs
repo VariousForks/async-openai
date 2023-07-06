@@ -4,7 +4,7 @@ use async_openai::{
 };
 use futures::{StreamExt, TryStreamExt};
 use std::error::Error;
-use std::{io::{stdout, Write}, process};
+use std::io::{stdout, Write};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -15,19 +15,30 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .messages([ChatCompletionRequestMessageArgs::default()
             .content("Write a marketing blog praising and introducing Rust library async-openai")
             .role(Role::User)
-            .build()?])
-        .build()?;
-    let chat_stream = client.chat().create_stream(request).await?;
+            .build().unwrap()])
+        .build().unwrap();
+        
+    let result = client.chat().create_stream(request).await;
 
-    let mut lock = stdout();
-    chat_stream
-        .map_err(|err| writeln!(lock, "error: {err}").unwrap())
-        .for_each(|response| {
-            response.choices.iter().for_each(|chat_choice| {
-                if let Some(ref content) = chat_choice.delta.content {
-                    write!(lock, "{}", content).unwrap();
+    match result {
+        Ok(mut chat_stream) => {
+            let mut lock = stdout();
+            while let Some(message) = chat_stream.next().await {
+                match message {
+                    Ok(response) => {
+                        for chat_choice in response.choices.iter() {
+                            if let Some(ref content) = chat_choice.delta.content {
+                                write!(lock, "{}", content).unwrap();
+                            }
+                        }
+                    }
+                    Err(_) => {
+                        writeln!(lock, "error: an error occurred while receiving a message from the stream").unwrap();
+                    }
                 }
-            });
-        })
-        .await
+            }
+            Ok(())
+        }
+        Err(_) => Err(Box::from("An error occurred while creating a stream"))
+    }
 }
