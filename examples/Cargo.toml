@@ -5,6 +5,7 @@ members = [
     "azure-openai-service",
     "chat",
     "chat-stream",
+    "chat-stream-func",
     "create-edit",
     "completions",
     "completions-stream",
